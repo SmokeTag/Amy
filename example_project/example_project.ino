@@ -38,9 +38,9 @@ float read_temperature();
 
 // =====================================================================================
 // --- Global Variables ---
-int menu_number = 1;
-bool sub_menu = 0;
-bool update_menu_flag = 1;
+int menu_number = 1;           // number of current menu 
+bool sub_menu = 0;             // inside menu_select()
+bool update_menu_flag = 1;     // flag for updating the menu
 
 // =====================================================================================
 // --- Inicial config ---
@@ -56,19 +56,19 @@ void setup() {
 // --- Main loop ---
 void loop() {
   if (!sub_menu && update_menu_flag) {  //if(not in submenu and update is needed)
-    switch (menu_number) {
+    switch (menu_number) {         // Main menu
       case 1:
         lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(">Read Temp");
         lcd.setCursor(1, 1);
-        lcd.print("2");
+        lcd.print("Play Music");
         update_menu_flag = 0;
         break;
       case 2:
         lcd.clear();
         lcd.setCursor(0, 0);
-        lcd.print(">2");
+        lcd.print(">Play Music");
         lcd.setCursor(1, 1);
         lcd.print("3");
         update_menu_flag = 0;
@@ -114,22 +114,26 @@ void read_bts() {
     menu_bounce = current_time; 
     menu_flag = 0x01;
   }  //end if(menu pressed)
-  if (!digitalRead(ent_bt) && (current_time - enter_bounce > 3)) { //if(button is pressed and it's been more than 3ms since last "press")
-    enter_bounce = current_time;
-    enter_flag = 0x01;
-  }  //end if(menu pressed)
-
   if (digitalRead(menu_bt) && menu_flag && (current_time - menu_bounce > debounce_time)) { //if(button is reliesed and flag is activated and time since button press > debounce_time)
     menu_bounce = current_time + 35;
     menu_flag = 0x00;
+    if (sub_menu) {
+      sub_menu = 0x00;
+      return;
+    }
     menu_number += 1;
     update_menu_flag = 1;
     if (menu_number > MENU_MAX) menu_number = 1;
   }  //end if menu
+
+  if (!digitalRead(ent_bt) && (current_time - enter_bounce > 3)) { //if(button is pressed and it's been more than 3ms since last "press")
+    enter_bounce = current_time;
+    enter_flag = 0x01;
+  }  //end if(menu pressed)
   if (digitalRead(ent_bt) && enter_flag && (current_time - enter_bounce > debounce_time)) { //if(button is reliesed and flag is activated and time since button press > debounce_time)
     enter_bounce = current_time + 35;
     enter_flag = 0x00;
-    sub_menu = !sub_menu;
+    sub_menu = 0x01;
     update_menu_flag = 1;
     menu_select();
   }  //end if enter
@@ -144,29 +148,24 @@ void menu_select() {
       lcd.print(">TEMP:");
       lcd.print(read_temperature());
       lcd.print("C");
-      lcd.setCursor(1, 1);
-      lcd.print(" ");
       break;
     case 2:
       lcd.clear();
       lcd.setCursor(0, 0);
-      lcd.print(">B");
+      lcd.print(">Playing song:");
       lcd.setCursor(1, 1);
-      lcd.print(" ");
+      lcd.print("Imperial March");
+      play_music();
       break;
     case 3:
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(">C");
-      lcd.setCursor(1, 1);
-      lcd.print(" ");
       break;
     case 4:
       lcd.clear();
       lcd.setCursor(0, 0);
       lcd.print(">D");
-      lcd.setCursor(1, 1);
-      lcd.print(" ");
       break;
     case 5:
       lcd.clear();
