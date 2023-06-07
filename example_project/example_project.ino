@@ -56,48 +56,40 @@ void setup() {
 // --- Main loop ---
 void loop() {
   if (!sub_menu && update_menu_flag) {  //if(not in submenu and update is needed)
-    switch (menu_number) {         // Main menu
+    lcd.clear();                   //clear display
+    switch (menu_number) {         //access main menu (prints it on LCD)
       case 1:
-        lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(">Read Temp");
         lcd.setCursor(1, 1);
         lcd.print("Play Music");
-        update_menu_flag = 0;
         break;
       case 2:
-        lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(">Play Music");
         lcd.setCursor(1, 1);
         lcd.print("3");
-        update_menu_flag = 0;
         break;
       case 3:
-        lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(">3");
         lcd.setCursor(1, 1);
         lcd.print("4");
-        update_menu_flag = 0;
         break;
       case 4:
-        lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(">4");
         lcd.setCursor(1, 1);
         lcd.print("5");
-        update_menu_flag = 0;
         break;
       case 5:
-        lcd.clear();
         lcd.setCursor(0, 0);
         lcd.print(">5");
         lcd.setCursor(1, 1);
         lcd.print("Read Temp");
-        update_menu_flag = 0;
         break;
     }  //end switch
+    update_menu_flag = 0;          //display is update no need to update it again unless a button is pressed
   }    //end if(!sub_menu)
   read_bts();
 }  //end loop
@@ -110,6 +102,7 @@ void read_bts() {
   static unsigned long menu_bounce = 0, enter_bounce = 0;    //time variable also related to software debouncing
   unsigned long current_time = millis();
 
+  //MENU BUTTON
   if (!digitalRead(menu_bt) && (current_time - menu_bounce > 3)) { //if(button is pressed and it's been more than 3ms since last "press")
     menu_bounce = current_time; 
     menu_flag = 0x01;
@@ -117,15 +110,16 @@ void read_bts() {
   if (digitalRead(menu_bt) && menu_flag && (current_time - menu_bounce > debounce_time)) { //if(button is reliesed and flag is activated and time since button press > debounce_time)
     menu_bounce = current_time + 35;
     menu_flag = 0x00;
+    update_menu_flag = 1;
     if (sub_menu) {
       sub_menu = 0x00;
       return;
-    }
+    } //end if(submenu)
     menu_number += 1;
-    update_menu_flag = 1;
     if (menu_number > MENU_MAX) menu_number = 1;
   }  //end if menu
 
+  //ENTER BUTTON
   if (!digitalRead(ent_bt) && (current_time - enter_bounce > 3)) { //if(button is pressed and it's been more than 3ms since last "press")
     enter_bounce = current_time;
     enter_flag = 0x01;
@@ -134,7 +128,6 @@ void read_bts() {
     enter_bounce = current_time + 35;
     enter_flag = 0x00;
     sub_menu = 0x01;
-    update_menu_flag = 1;
     menu_select();
   }  //end if enter
 }  //end read_bts
