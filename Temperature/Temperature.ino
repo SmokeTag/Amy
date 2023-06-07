@@ -44,4 +44,4 @@ float read_temperature() {
   float temperature = analogRead(0);
   temperature = temperature * 0.48828125 - 50;
   return temperature;
-}
+} //end read_temperature

@@ -13,13 +13,13 @@
 #define db2 10
 #define db1 9
 #define db0 8
-
 #define rs 13
 #define en 12
 
 #define menu_bt 19
 #define ent_bt 18
 
+#define sensor_temp 0 
 
 // =====================================================================================
 // --- Project Constants ---
@@ -29,15 +29,16 @@ const int debounce_time = 30;  // time in milliseconds
 
 // =====================================================================================
 // --- Function Prototypes ---
-void read_bts();
-void menu_select();
+void  read_bts();
+void  menu_select();
+float read_temperature();
 
 
 // =====================================================================================
 // --- Global Variables ---
 int menu_number = 1;
 bool sub_menu = 0;
-
+bool update_flag = 1;
 
 // =====================================================================================
 // --- Inicial config ---
@@ -53,37 +54,47 @@ void setup() {
 // =====================================================================================
 // --- Loop Infinito ---
 void loop() {
-  if (!sub_menu) {
+  if (!sub_menu && update_flag) {
     switch (menu_number) {
       case 1:
-        lcd.setCursor(1, 0);
-        lcd.print("1");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(">Read Temp");
         lcd.setCursor(1, 1);
         lcd.print("2");
+        update_flag = 0;
         break;
       case 2:
-        lcd.setCursor(1, 0);
-        lcd.print("2");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(">2");
         lcd.setCursor(1, 1);
         lcd.print("3");
+        update_flag = 0;
         break;
       case 3:
-        lcd.setCursor(1, 0);
-        lcd.print("3");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(">3");
         lcd.setCursor(1, 1);
         lcd.print("4");
+        update_flag = 0;
         break;
       case 4:
-        lcd.setCursor(1, 0);
-        lcd.print("4");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(">4");
         lcd.setCursor(1, 1);
         lcd.print("5");
+        update_flag = 0;
         break;
       case 5:
-        lcd.setCursor(1, 0);
-        lcd.print("5");
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        lcd.print(">5");
         lcd.setCursor(1, 1);
-        lcd.print("1");
+        lcd.print("Read Temp");
+        update_flag = 0;
         break;
     }  //end switch
   }    //end if(!sub_menu)
@@ -111,12 +122,14 @@ void read_bts() {
     menu_bounce = current_time + 35;
     menu_flag = 0x00;
     menu_number += 1;
+    update_flag = 1;
     if (menu_number > MENU_MAX) menu_number = 1;
   }  //end if menu
   if (digitalRead(ent_bt) && enter_flag && (current_time - enter_bounce > debounce_time)) {
     enter_bounce = current_time + 35;
     enter_flag = 0x00;
     sub_menu = !sub_menu;
+    update_flag = 1;
     menu_select();
   }  //end if enter
 }  //end read_bts
@@ -125,37 +138,51 @@ void read_bts() {
 void menu_select() {
   switch (menu_number) {
     case 1:
-      lcd.setCursor(1, 0);
-      lcd.print("A");
-      lcd.setCursor(1, 1);
-      lcd.print(" ");
-      break;
-    case 2:
-      lcd.setCursor(1, 0);
-      lcd.print("B");
-      lcd.setCursor(1, 1);
-      lcd.print(" ");
-      break;
-    case 3:
-      lcd.setCursor(1, 0);
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(">TEMP:");
+      lcd.print(read_temperature());
       lcd.print("C");
       lcd.setCursor(1, 1);
       lcd.print(" ");
       break;
+    case 2:
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(">B");
+      lcd.setCursor(1, 1);
+      lcd.print(" ");
+      break;
+    case 3:
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(">C");
+      lcd.setCursor(1, 1);
+      lcd.print(" ");
+      break;
     case 4:
-      lcd.setCursor(1, 0);
-      lcd.print("D");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(">D");
       lcd.setCursor(1, 1);
       lcd.print(" ");
       break;
     case 5:
-      lcd.setCursor(1, 0);
-      lcd.print("E");
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(">E");
       lcd.setCursor(1, 1);
       lcd.print(" ");
       break;
   }  //end switch
 }  //end menu_select
+
+
+float read_temperature() {
+  float temperature = analogRead(0);
+  temperature = temperature * 0.48828125 - 50;
+  return temperature;
+} //end read_temperature
 
 
 // =====================================================================================
