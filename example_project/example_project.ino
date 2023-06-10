@@ -109,10 +109,6 @@ void loop() {
 // =====================================================================================
 // --- Desenvolvimento das Funções ---
 void read_bts() {
-  static bool enter_flag = 0, up_flag = 0, down_flag = 0;                 //flags related to software debounce of buttons
-  static unsigned long enter_bounce = 0, up_bounce = 0, down_bounce = 0;    //time variable also related to software debouncing
-  unsigned long current_time = millis();
-
   if (read_bt_menu())   return;
   if (read_bt_enter ()) return;
   if (read_bt_up())     return;

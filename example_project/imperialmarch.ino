@@ -140,6 +140,7 @@ int divider = 0, noteDuration = 0;
 
 void play_music() {
   for (int thisNote = 0; thisNote < notes * 2; thisNote = thisNote + 2) {
+    if(read_bt_menu()) break;
 
     // calculates the duration of each note
     divider = melody[thisNote + 1];
